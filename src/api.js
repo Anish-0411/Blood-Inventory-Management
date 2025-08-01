@@ -4,7 +4,8 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 
 const API = axios.create({
-  baseURL: 'http://${process.env.REACT_APP_API_URL}/api',
+  // baseURL: 'http://${process.env.REACT_APP_API_URL}/api',
+  baseURL: `${process.env.REACT_APP_API_URL}/api`,
   withCredentials: true, 
 });
 
