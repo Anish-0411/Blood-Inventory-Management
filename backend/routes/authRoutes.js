@@ -47,8 +47,8 @@ router.post('/login', async (req, res) => {
     res
       .cookie('token', token, {
         httpOnly: true,
-        secure: false, // Set to true in production (HTTPS)
-        sameSite: 'Lax',
+        secure: true,
+        sameSite: 'None', 
       })
       .status(200)
       .json({
