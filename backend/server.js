@@ -70,7 +70,7 @@ app.get('/', (req, res) => {
 });
 
 // ✅ Start server with socket.io
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 10000;
 const server = http.createServer(app);
 
 
