@@ -9,7 +9,8 @@ const app = express();
 
 // ✅ Only use this CORS setup
 app.use(cors({
-  origin: "http://localhost:3000",
+  // origin: "http://localhost:3000",
+  origin: process.env.CORS_ORIGIN || '*',
   credentials: true
 }));
 
@@ -53,9 +54,17 @@ app.get('/', (req, res) => {
 // ✅ Start server with socket.io
 const PORT = process.env.PORT || 5050;
 const server = http.createServer(app);
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     credentials: true
+//   }
+// });
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST'],
     credentials: true
   }
 });
@@ -76,5 +85,6 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`🚀 Server with socket.io running at http://localhost:${PORT}`);
+  // console.log(`🚀 Server with socket.io running at http://localhost:${PORT}`);
+  console.log(`🚀 Server with socket.io running on port ${PORT}`);
 });

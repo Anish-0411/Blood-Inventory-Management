@@ -7,6 +7,6 @@ const socket = io(API, {
   transports: ["websocket"],
 });
 
-// const socket = io('http://${process.env.REACT_APP_API_URL}'); 
+
 
 export default socket;
