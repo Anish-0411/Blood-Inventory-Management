@@ -32,8 +32,10 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/organ_donat
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
+
+app.options('*', cors()); // 👈 Enable CORS preflight for all routes
 // ✅ Routes
-app.use('/api/auth', require('./routes/authRoutes'));        
+app.use('/api/auth', require('./routes/authRoutes'));      
 
 app.use('/api/matches', require('./routes/matchRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
@@ -96,3 +98,4 @@ server.listen(PORT, () => {
   // console.log(`🚀 Server with socket.io running at http://localhost:${PORT}`);
   console.log(`🚀 Server with socket.io running on port ${PORT}`);
 });
+

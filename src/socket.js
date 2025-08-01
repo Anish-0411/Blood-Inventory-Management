@@ -8,7 +8,7 @@ import { io } from 'socket.io-client';
 //   secure: true,
 // });
 const socket = io(process.env.REACT_APP_API_URL, {
-  transports: ["websocket", "polling"], // ← enable fallback
+  transports: ["websocket", "polling"],
   secure: true,
   reconnection: true,
 });
