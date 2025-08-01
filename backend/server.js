@@ -16,11 +16,16 @@ const app = express();
 //   credentials: true
 // }));
 
+const allowedOrigin = process.env.CORS_ORIGIN;
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: allowedOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
+
+
+app.options('*', cors({ origin: allowedOrigin, credentials: true }));
 
 app.use(express.json());
 
@@ -33,7 +38,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/organ_donat
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 
-app.options('*', cors()); // 👈 Enable CORS preflight for all routes
+
 // ✅ Routes
 app.use('/api/auth', require('./routes/authRoutes'));      
 
@@ -64,16 +69,11 @@ app.get('/', (req, res) => {
 // ✅ Start server with socket.io
 const PORT = process.env.PORT || 5050;
 const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:3000",
-//     credentials: true
-//   }
-// });
+
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: allowedOrigin,
     methods: ['GET', 'POST'],
     credentials: true
   }
