@@ -24,8 +24,11 @@ export const getBlood = () => API.get('/blood');
 export const searchBlood = (params) => API.get('/blood/search', { params });
 
 
-export const createBlood = (data) => axios.post('/api/blood/create', data);
-export const requestMatch = (data) => axios.post('/api/match/request', data);
+// export const createBlood = (data) => axios.post('/api/blood/create', data);
+// export const requestMatch = (data) => axios.post('/api/match/request', data);
+
+export const createBlood = (data) => API.post('/blood/create', data);
+export const requestMatch = (data) => API.post('/match/request', data);
 
 export const registerDonor = (formData) => API.post('/donors', formData);
 export const getDonors = () => API.get('/donors');
