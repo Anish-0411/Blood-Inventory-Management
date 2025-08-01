@@ -11,7 +11,7 @@ function Integration() {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const res = await axios.get('http://localhost:5050/api/hospitals');
+        const res = await axios.get('http://${process.env.REACT_APP_API_URL}/api/hospitals');
         const hospitals = res.data.map(h => {
           const lowUnits = h.bloodInventory?.filter(unit => unit.quantity < 10).map(u => u.type);
           const status = lowUnits?.length
@@ -38,8 +38,8 @@ function Integration() {
     try {
       const endpoint =
         action === 'Sync Now'
-          ? `http://localhost:5050/api/integration/sync/${id}`
-          : `http://localhost:5050/api/integration/retry/${id}`;
+          ? `http://${process.env.REACT_APP_API_URL}/api/integration/sync/${id}`
+          : `http://${process.env.REACT_APP_API_URL}/api/integration/retry/${id}`;
       const syncRes = await axios.post(endpoint);
       const updatedSystem = syncRes.data;
 
@@ -97,7 +97,7 @@ function Integration() {
 
   const handleOpenInventoryModal = async (system) => {
     try {
-      const res = await axios.get(`http://localhost:5050/api/blood-inventory/${system.hospitalId}`);
+      const res = await axios.get(`http://${process.env.REACT_APP_API_URL}/api/blood-inventory/${system.hospitalId}`);
       setSystemInventory(res.data);
       setModalSystem(system.name);
       setModalVisible(true);

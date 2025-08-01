@@ -12,7 +12,7 @@ const OrganTable = ({ organType, bloodGroup, city }) => {
     }
     const fetchDonors = async () => {
       try {
-        const url = new URL("http://localhost:5050/api/find-donors");
+        const url = new URL("http://${process.env.REACT_APP_API_URL}/api/find-donors");
         url.searchParams.append("city", city);
         if (organType) url.searchParams.append("organ", organType);
         if (bloodGroup) url.searchParams.append("bloodType", bloodGroup);

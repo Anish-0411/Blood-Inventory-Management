@@ -23,7 +23,7 @@ function Request() {
 useEffect(() => {
     const fetchHospitals = async () => {
       try {
-        const res = await axios.get('http://localhost:5050/api/hospitals'); // Confirmed correct
+        const res = await axios.get('http://${process.env.REACT_APP_API_URL}/api/hospitals'); // Confirmed correct
         const allHospitals = res.data;
 
         const currentId = localStorage.getItem('hospitalId');
@@ -50,7 +50,7 @@ useEffect(() => {
 
     const fetchRequests = async () => {
       try {
-        const res = await axios.get('http://localhost:5050/api/requests');
+        const res = await axios.get('http://${process.env.REACT_APP_API_URL}/api/requests');
         const currentHospitalId = localStorage.getItem('hospitalId');
         const filtered = res.data.filter(
           r =>
@@ -137,7 +137,7 @@ useEffect(() => {
       console.log("Sending request:", newRequest);
 
       try {
-        const response = await axios.post('http://localhost:5050/api/requests', newRequest);
+        const response = await axios.post('http://${process.env.REACT_APP_API_URL}/api/requests', newRequest);
         socket.emit('bloodRequest', response.data);
       } catch (err) {
         console.error("Failed to save new request:", err);
@@ -159,7 +159,7 @@ useEffect(() => {
   // Handle request actions
   const handleRequestAction = async (id, action) => {
     try {
-      await axios.put(`http://localhost:5050/api/requests/${id}`, { status: action });
+      await axios.put(`http://${process.env.REACT_APP_API_URL}/api/requests/${id}`, { status: action });
 
       if (action === 'Rejected') {
         setRequests(requests.map(req =>

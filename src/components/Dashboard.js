@@ -53,7 +53,7 @@ function Dashboard() {
   useEffect(() => {
     if (!hospitalId) return;
     // The endpoint below expects the hospitalId to be the custom hospital code (e.g., "HOS003")
-    fetch(`http://localhost:5050/api/organisation/hospital-id/${hospitalId}`)
+    fetch(`http://${process.env.REACT_APP_API_URL}/api/organisation/hospital-id/${hospitalId}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         return res.json();
@@ -71,7 +71,7 @@ function Dashboard() {
   // Fetch blood inventory
   useEffect(() => {
     if (!hospitalId) return;
-    fetch(`http://localhost:5050/api/blood-inventory/${hospitalId}`)
+    fetch(`http://${process.env.REACT_APP_API_URL}/api/blood-inventory/${hospitalId}`)
       .then(res => res.json())
       .then(data => {
         const bloodData = data.bloodInventory || [];
@@ -123,14 +123,14 @@ const handleSaveChanges = async () => {
     console.log("➡️ Saving units to backend:", editableInventory);
   try {
     // Ensure all 8 blood types are always updated/created
-    await fetch(`http://localhost:5050/api/blood-inventory/update-units/${hospitalId}`, {
+    await fetch(`http://${process.env.REACT_APP_API_URL}/api/blood-inventory/update-units/${hospitalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ updatedUnits: editableInventory })
     });
 
     // After update, fetch the inventory again to ensure all 8 types are present
-    fetch(`http://localhost:5050/api/blood-inventory/${hospitalId}`)
+    fetch(`http://${process.env.REACT_APP_API_URL}/api/blood-inventory/${hospitalId}`)
       .then(res => res.json())
       .then(data => {
         console.log("Fetched blood data:", data);
