@@ -10,10 +10,14 @@ import { io } from 'socket.io-client';
 const socket = io(process.env.REACT_APP_API_URL, {
   transports: ["websocket", "polling"],
   secure: true,
+  withCredentials: true,
   reconnection: true,
 });
 
 
+socket.on('connect_error', (err) => {
+  console.error("❌ WebSocket failed:", err.message);
+});
 
 export default socket;
 
