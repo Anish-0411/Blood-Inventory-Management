@@ -1,13 +1,11 @@
+
 import React, { useState } from 'react';
 
 const FormPanel = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
     bloodGroup: '',
     organ: '',
-    state: '',
-    city: '',
-    zip: '',
-    urgency: 'Medium'
+    city: ''
   });
 
   const handleChange = (e) => {
@@ -16,7 +14,13 @@ const FormPanel = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Prepare data to send to parent: map bloodGroup -> bloodType
+    const { bloodGroup, organ, city } = formData;
+    onSubmit({ organ, bloodType: bloodGroup, city });
+  };
+
+  const handleReset = () => {
+    setFormData({ bloodGroup: '', organ: '', city: '' });
   };
 
   return (
@@ -27,7 +31,12 @@ const FormPanel = ({ onSubmit }) => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="bloodGroup">Blood Group</label>
-          <select id="bloodGroup" name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} required>
+          <select 
+            id="bloodGroup" 
+            name="bloodGroup" 
+            value={formData.bloodGroup} 
+            onChange={handleChange}
+          >
             <option value="">-- Select Blood Group --</option>
             <option>O+</option>
             <option>O-</option>
@@ -42,7 +51,12 @@ const FormPanel = ({ onSubmit }) => {
 
         <div className="form-group">
           <label htmlFor="organ">Organ</label>
-          <select id="organ" name="organ" value={formData.organ} onChange={handleChange} required>
+          <select 
+            id="organ" 
+            name="organ" 
+            value={formData.organ} 
+            onChange={handleChange}
+          >
             <option value="">-- Select Organ --</option>
             <option>Heart</option>
             <option>Kidney</option>
@@ -52,33 +66,26 @@ const FormPanel = ({ onSubmit }) => {
           </select>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="state">State</label>
-          <input type="text" id="state" name="state" value={formData.state} onChange={handleChange} required />
-        </div>
-
+        {/* Removed State and Zip fields - only City is used */}
         <div className="form-group">
           <label htmlFor="city">City</label>
-          <input type="text" id="city" name="city" value={formData.city} onChange={handleChange} required />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="zip">Zip</label>
-          <input type="text" id="zip" name="zip" value={formData.zip} onChange={handleChange} required />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="urgency">Urgency</label>
-          <select id="urgency" name="urgency" value={formData.urgency} onChange={handleChange} required>
-            <option>High</option>
-            <option>Medium</option>
-            <option>Low</option>
-          </select>
+          <input 
+            type="text" 
+            id="city" 
+            name="city" 
+            value={formData.city} 
+            onChange={handleChange} 
+            required 
+          />
         </div>
 
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-          <button type="reset" className="filter-reset">Clear</button>
-          <button type="submit" className="filter-submit">Submit</button>
+          <button type="button" className="filter-reset" onClick={handleReset}>
+            Clear
+          </button>
+          <button type="submit" className="filter-submit">
+            Submit
+          </button>
         </div>
       </form>
     </>

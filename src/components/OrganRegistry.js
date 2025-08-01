@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 
+
 function Registry() {
   const [view, setView] = useState("home");
 
@@ -13,7 +14,7 @@ function Registry() {
       <div className="container-fluid vh-100 d-flex">
         {/* Donor Section */}
         <div className="col-6 d-flex flex-column justify-content-center align-items-center bg-light border-end">
-          <h2 className="mb-4">Donor?</h2>
+          <h2 className="mb-4">Donor</h2>
           <button className="btn btn-primary" onClick={() => setView("donor")}>
             Register as Donor
           </button>
@@ -102,22 +103,39 @@ function RegistrationDonor({ setView }) {
 
   const prevStep = () => setStep(step - 1);
 
+
+
+
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState(""); 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post("http://localhost:5050/api/donors", formData);
 
-      if (response.status === 200) {
-        alert("Donor registered successfully!");
-        setView("home"); // Go back to landing page
+      if (response.status === 201) {
+        showPopup("✅ Donor registered successfully!", "success");
+        setTimeout(() => setView("home"), 3000);
       } else {
-        alert("Registration failed. Please try again.");
+        showPopup("❌ Registration failed. Please try again.", "error");
       }
     } catch (error) {
       console.error("Submission error:", error);
-      alert("An error occurred while submitting the form.");
+      showPopup("⚠️ An error occurred while submitting the form.", "error");
     }
+  };
+
+  const showPopup = (msg, type) => {
+    setPopupMessage(msg);
+    setPopupType(type);
+
+    // Automatically clear the popup after 3s
+    setTimeout(() => {
+      setPopupMessage("");
+      setPopupType("");
+    }, 3000);
   };
 
   const isBloodEnabled = ["Blood", "Organ", "Both"].includes(formData.donationType);
@@ -134,7 +152,47 @@ function RegistrationDonor({ setView }) {
           Save Draft
         </button>
       </header>
+      <style>{`
+  .popup-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    animation: fadeInOut 3s forwards;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
 
+  .popup-success {
+    background-color: rgba(40, 167, 69, 0.85); /* green with transparency */
+  }
+
+  .popup-error {
+    background-color: rgba(220, 53, 69, 0.85); /* red with transparency */
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+  }
+`}</style>
+      {popupMessage && (
+        <div className={`popup-message popup-${popupType}`}>
+          {popupMessage}
+        </div>
+      )}{popupMessage && (
+        <div className={`popup-message popup-${popupType}`}>
+          {popupMessage}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="p-4">
         <div className="progress mb-4" style={{ height: "10px" }}>
           <div className="progress-bar bg-success" role="progressbar" style={{ width: `${step * 33.3}%` }}></div>
@@ -442,20 +500,35 @@ function RegistrationRecipient({ setView }) {
     }
   };
 
+
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState(""); // "success" or "error"
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const response = await axios.post("http://localhost:5050/api/recipients", formData);
+
       if (response.status === 201) {
-        alert("Recipient registered successfully!");
-        setView("home");
+        showPopup(" Recipient registered successfully!", "success");
+        setTimeout(() => setView("home"), 3000);
       } else {
-        alert("Submission failed");
+        showPopup(" Submission failed. Please try again.", "error");
       }
     } catch (error) {
       console.error("Error submitting form:", error.response ? error.response.data : error.message);
-      alert("Something went wrong while submitting the form.");
+      showPopup("⚠️ Something went wrong while submitting the form.", "error");
     }
+  };
+
+  const showPopup = (msg, type) => {
+    setPopupMessage(msg);
+    setPopupType(type);
+    setTimeout(() => {
+      setPopupMessage("");
+      setPopupType("");
+    }, 3000);
   };
 
   const isBloodEnabled = ["Blood", "Organ", "Both"].includes(formData.donationType);
@@ -472,7 +545,45 @@ function RegistrationRecipient({ setView }) {
           Save Draft
         </button>
       </header>
+      <style>{`
+  .popup-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    animation: fadeInOut 3s forwards;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
 
+  .popup-success {
+    background-color: rgba(40, 167, 69, 0.85); /* green with transparency */
+  }
+
+  .popup-error {
+    background-color: rgba(220, 53, 69, 0.85); /* red with transparency */
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+  }
+`}</style>
+
+      {/* Popup display */}
+      {popupMessage && (
+        <div className={`popup-message popup-${popupType}`}>
+          {popupMessage}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="p-4">
         <div className="progress mb-4" style={{ height: "10px" }}>
           <div className="progress-bar bg-success" role="progressbar" style={{ width: `${step * 33.3}%` }}></div>
@@ -684,5 +795,8 @@ function RegistrationRecipient({ setView }) {
     </div>
   );
 }
+
+
+
 
 export default Registry;

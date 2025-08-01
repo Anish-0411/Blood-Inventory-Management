@@ -40,5 +40,23 @@ exports.loginUser = async (req, res) => {
     return res.status(401).json({ message: 'Invalid password' });
 
   const token = generateToken(org);
-  res.status(200).json({ message: 'Login successful', token });
+
+  res
+    .cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Lax',
+    })
+    .status(200)
+    .json({
+      message: 'Login successful',
+      token,
+      hospital: {
+        _id: org._id,
+        name: org.name,
+        id: org.id,
+        hospitalId: org.id,
+        location: org.location,
+      }
+    });
 };

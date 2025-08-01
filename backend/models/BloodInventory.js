@@ -1,42 +1,16 @@
-// const mongoose = require('mongoose');
-
-// const bloodInventorySchema = new mongoose.Schema({
-//   orgId: {
-//     type: String,
-//     required: true,
-//   },
-//   bloodGroup: {
-//     type: String,
-//     enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-//     required: true
-//   },
-//   quantity: {
-//     type: Number,
-//     default: 0
-//   },
-//   lastUpdated: {
-//     type: Date,
-//     default: Date.now
-//   }
-// });
-
 const mongoose = require('mongoose');
 
-
-const bloodInventorySchema = new mongoose.Schema({
-  orgId: {
+const BloodInventorySchema = new mongoose.Schema({
+  hospitalId: {
     type: String,
-    required: true,
+    required: true,  // e.g., "HOS001"
+    ref: 'Hospital'  // reference to hospital
   },
-  bloodGroup: {
-    type: String,
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
+  bloodGroup: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  status: { type: String, default: 'Stable' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('BloodInventory', bloodInventorySchema);
+BloodInventorySchema.index({ hospitalId: 1, bloodGroup: 1 }, { unique: true });
+
+module.exports = mongoose.model('BloodInventory', BloodInventorySchema);

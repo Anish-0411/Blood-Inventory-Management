@@ -1,15 +1,28 @@
 const BloodRequest = require('../models/BloodRequest');
 
-
-
-
-
-
 // Create request
 exports.createRequest = async (req, res) => {
   try {
-    const request = new BloodRequest(req.body);
+    console.log("Incoming request body:", req.body);
+    const { bloodType, quantity, urgency, location, status, from, to } = req.body;
+
+    const request = new BloodRequest({
+      bloodType,
+      quantity,
+      urgency,
+      location,
+      status,
+      from,
+      to
+    });
+
     await request.save();
+
+    if (req.app.get('io')) {
+      const io = req.app.get('io');
+      io.emit('newBloodRequest', request);
+    }
+
     res.status(201).json(request);
   } catch (err) {
     res.status(400).json({ error: err.message });

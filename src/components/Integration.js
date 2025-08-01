@@ -3,7 +3,6 @@ import axios from 'axios';
 
 function Integration() {
   const [systems, setSystems] = useState([]);
-  const [bloodInventory, setBloodInventory] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalSystem, setModalSystem] = useState(null);
   const [systemInventory, setSystemInventory] = useState([]);
@@ -12,27 +11,28 @@ function Integration() {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const res = await axios.get('http://localhost:5050/api/integration');
-        setSystems(res.data);
+        const res = await axios.get('http://localhost:5050/api/hospitals');
+        const hospitals = res.data.map(h => {
+          const lowUnits = h.bloodInventory?.filter(unit => unit.quantity < 10).map(u => u.type);
+          const status = lowUnits?.length
+            ? `⚠️ Low: ${lowUnits.join(', ')}`
+            : '✔️ Healthy';
+          const color = lowUnits?.length ? '#FFCDD2' : '#C8E6C9';
+          return {
+            ...h,
+            status,
+            color,
+            lastSync: h.lastSync ? new Date(h.lastSync).toLocaleString() : 'N/A',
+          };
+        });
+        setSystems(hospitals);
       } catch (error) {
-        console.error('❌ Error fetching systems:', error);
+        console.error('❌ Error fetching hospital systems:', error);
       }
     };
     fetchSystems();
   }, []);
 
-  // Fetch all blood inventory (for the table below)
-  useEffect(() => {
-    const fetchBloodInventory = async () => {
-      try {
-        const res = await axios.get('http://localhost:5050/api/bloodinventories');
-        setBloodInventory(res.data);
-      } catch (error) {
-        console.error('❌ Error fetching blood inventory:', error);
-      }
-    };
-    fetchBloodInventory();
-  }, []);
 
   const handleAction = async (action, id) => {
     try {
@@ -40,9 +40,23 @@ function Integration() {
         action === 'Sync Now'
           ? `http://localhost:5050/api/integration/sync/${id}`
           : `http://localhost:5050/api/integration/retry/${id}`;
-      await axios.post(endpoint);
-      const res = await axios.get('http://localhost:5050/api/integration');
-      setSystems(res.data);
+      const syncRes = await axios.post(endpoint);
+      const updatedSystem = syncRes.data;
+
+      setSystems(prev =>
+        prev.map(sys =>
+          sys.hospitalId === id
+            ? {
+                ...sys,
+                lastSync: updatedSystem.lastSync
+                  ? new Date(updatedSystem.lastSync).toLocaleString() 
+                  : 'Just now',
+                status: sys.status,
+                color: sys.color,
+              }
+            : sys
+        )
+      );
     } catch (err) {
       console.error(`❌ Error performing ${action}:`, err);
     }
@@ -83,7 +97,7 @@ function Integration() {
 
   const handleOpenInventoryModal = async (system) => {
     try {
-      const res = await axios.get(`http://localhost:5050/api/bloodinventory/org/${system.orgId}`);
+      const res = await axios.get(`http://localhost:5050/api/blood-inventory/${system.hospitalId}`);
       setSystemInventory(res.data);
       setModalSystem(system.name);
       setModalVisible(true);
@@ -113,6 +127,8 @@ function Integration() {
             <thead>
               <tr style={styles.tableHeaderRow}>
                 <th style={styles.cell}>System Name</th>
+                <th style={styles.cell}>Location</th>
+                <th style={styles.cell}>Email</th>
                 <th style={styles.cell}>Status</th>
                 <th style={styles.cell}>Last Sync</th>
                 <th style={styles.cell}>Actions</th>
@@ -122,6 +138,8 @@ function Integration() {
               {systems.map((sys) => (
                 <tr key={sys._id}>
                   <td style={styles.cell}>{sys.name}</td>
+                  <td style={styles.cell}>{sys.location}</td>
+                  <td style={styles.cell}>{sys.email}</td>
                   <td style={{ ...styles.cell, backgroundColor: sys.color || '#eee' }}>
                     {sys.status}
                   </td>
@@ -129,15 +147,9 @@ function Integration() {
                   <td style={styles.cell}>
                     <button
                       style={{ ...styles.actionButton, backgroundColor: '#2E7D32' }}
-                      onClick={() => handleAction('Sync Now', sys._id)}
+                      onClick={() => handleAction('Sync Now', sys.hospitalId)}
                     >
                       Sync Now
-                    </button>
-                    <button
-                      style={{ ...styles.actionButton, backgroundColor: '#D32F2F' }}
-                      onClick={() => handleAction('Retry', sys._id)}
-                    >
-                      Retry
                     </button>
                     <button
                       style={{ ...styles.actionButton, backgroundColor: '#0288D1' }}
@@ -146,7 +158,10 @@ function Integration() {
                       📄 Export Logs
                     </button>
                     <button
-                      style={{ ...styles.actionButton, backgroundColor: '#6A1B9A' }}
+                      style={{ ...styles.actionButton,backgroundColor: '#ffffff',
+                          color: '#C62828',
+                          border: '2px solid #C62828',
+                          fontWeight: '700' }}
                       onClick={() => handleOpenInventoryModal(sys)}
                     >
                       🩸 View Inventory
@@ -158,62 +173,36 @@ function Integration() {
           </table>
         </div>
 
-        {/* General Blood Inventory Table */}
-        {/* <h2 style={styles.heading}>Blood Inventory</h2>
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.cell}>Organization ID</th>
-                <th style={styles.cell}>Blood Group</th>
-                <th style={styles.cell}>Quantity (ml)</th>
-                <th style={styles.cell}>Last Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bloodInventory.map((inv, idx) => (
-                <tr key={idx}>
-                  <td style={styles.cell}>{inv.orgId}</td>
-                  <td style={styles.cell}>{inv.bloodGroup}</td>
-                  <td style={styles.cell}>{inv.quantity}</td>
-                  <td style={styles.cell}>{new Date(inv.lastUpdated).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div> */}
 
         {/* Modal for View Inventory */}
         {modalVisible && (
-          <div style={styles.modal}>
-            <h3 style={{ color: '#C62828' }}>Inventory for {modalSystem}</h3>
-            {systemInventory.length ? (
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.cell}>Blood Group</th>
-                    <th style={styles.cell}>Quantity (ml)</th>
-                    <th style={styles.cell}>Last Updated</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {systemInventory.map((item, index) => (
-                    <tr key={index}>
-                      <td style={styles.cell}>{item.bloodGroup}</td>
-                      <td style={styles.cell}>{item.quantity}</td>
-                      <td style={styles.cell}>{new Date(item.lastUpdated).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>No inventory found for this organization.</p>
-            )}
-            <button style={styles.closeButton} onClick={handleCloseModal}>
-              Close
-            </button>
-          </div>
-        )}
+  <div style={styles.fullModalOverlay}>
+    <div style={styles.fullModal}>
+      <button style={styles.closeModalX} onClick={handleCloseModal}>✖</button>
+      <h2 style={{ color: '#C62828', marginBottom: '16px' }}>🩸 Inventory of {modalSystem}</h2>
+      {systemInventory?.bloodInventory?.length ? (
+        <table style={styles.modalTable}>
+          <thead>
+            <tr>
+              <th style={styles.cell}>Blood Type</th>
+              <th style={styles.cell}>Quantity (ml)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {systemInventory.bloodInventory.map((item, index) => (
+              <tr key={index}>
+                <td style={styles.cell}>{item.type}</td>
+                <td style={styles.cell}>{item.quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p style={{ color: '#888' }}>No inventory found for this organization.</p>
+      )}
+    </div>
+  </div>
+)}
       </main>
 
 
@@ -231,6 +220,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   backButton: {
     backgroundColor: 'white',
     color: '#C62828',
@@ -239,64 +229,113 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
   },
+
   main: {
     backgroundColor: '#ffffff',
     padding: '16px',
   },
+
   heading: {
     color: '#C62828',
     marginTop: '32px',
   },
+
   exportCSVButton: {
-    backgroundColor: '#2E7D32',
-    color: 'white',
+    backgroundColor: '#C62828',
+    color: '#fff',
     border: 'none',
-    padding: '8px 16px',
-    borderRadius: '4px',
+    padding: '10px 18px',
+    borderRadius: '999px',
     cursor: 'pointer',
-    marginBottom: '10px',
+    fontSize: '15px',
+    fontWeight: '600',
+    marginBottom: '16px',
+    boxShadow: '0 4px 10px rgba(198, 40, 40, 0.3)',
+    transition: 'all 0.3s ease',
   },
+
   tableContainer: {
     overflowY: 'auto',
     maxHeight: '400px',
     border: '1px solid #999',
     marginBottom: '20px',
+    borderRadius: '8px',
   },
+
   table: {
     width: '100%',
     borderCollapse: 'collapse',
   },
+
   tableHeaderRow: {
     backgroundColor: '#f5f5f5',
     borderBottom: '1px solid #999',
   },
+
   cell: {
-    padding: '8px',
+    padding: '10px',
     textAlign: 'left',
+    fontSize: '14px',
   },
+
   actionButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
     marginRight: '8px',
     marginTop: '4px',
     color: 'white',
     border: 'none',
-    borderRadius: '4px',
-    padding: '6px 10px',
+    borderRadius: '999px',
+    padding: '8px 14px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '14px',
+    boxShadow: '0 3px 8px rgba(0,0,0,0.2)',
+    transition: 'all 0.2s ease-in-out',
+  },
+
+  fullModalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999,
+  },
+
+  fullModal: {
+    width: '70%',
+    maxHeight: '80vh',
+    overflowY: 'auto',
+    backgroundColor: '#fff',
+    padding: '24px 32px',
+    borderRadius: '12px',
+    boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
+    position: 'relative',
+  },
+
+  closeModalX: {
+    position: 'absolute',
+    top: '16px',
+    right: '20px',
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    color: '#C62828',
     cursor: 'pointer',
   },
-  modal: {
-    position: 'fixed',
-    top: '10%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: 'white',
-    border: '2px solid #C62828',
-    padding: '24px',
-    zIndex: 1000,
-    width: '500px',
-    maxHeight: '70vh',
-    overflowY: 'auto',
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
+
+  modalTable: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginTop: '10px',
   },
+
   closeButton: {
     marginTop: '16px',
     backgroundColor: '#C62828',
@@ -306,6 +345,7 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
   },
+
   footer: {
     backgroundColor: '#C62828',
     color: 'white',
@@ -315,5 +355,4 @@ const styles = {
     fontSize: '14px',
   },
 };
-
 export default Integration;

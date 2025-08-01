@@ -9,6 +9,7 @@ const donorSchema = new mongoose.Schema({
   phone: String,
   donationType: String,
   bloodType: String,
+  organType: String,
   medicalHistory: String,
   consent1: Boolean,
   consent2: Boolean,

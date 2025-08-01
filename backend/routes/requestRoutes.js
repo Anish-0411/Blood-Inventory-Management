@@ -6,7 +6,8 @@ const BloodRequest = require('../models/BloodRequest');
 // GET all requests
 router.get('/', async (req, res) => {
   try {
-    const requests = await BloodRequest.find();
+    // Return requests sorted by createdAt descending
+    const requests = await BloodRequest.find().sort({ createdAt: -1 });
     res.json(requests);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -15,16 +16,34 @@ router.get('/', async (req, res) => {
 
 // POST new request
 router.post('/', async (req, res) => {
-  const { bloodType, quantity, urgency, location, status } = req.body;
+  // Ensure all fields including 'from' and 'to' are explicitly set
+  const {
+    bloodType = undefined,
+    quantity = undefined,
+    urgency = undefined,
+    location = undefined,
+    status,
+    from = undefined,
+    to = undefined
+  } = req.body;
   try {
     const newRequest = new BloodRequest({
-      bloodType,
-      quantity,
-      urgency,
-      location,
-      status,
+      bloodType: bloodType,
+      quantity: quantity,
+      urgency: urgency,
+      location: location,
+      status: status || 'Pending',
+      from: from,
+      to: to
     });
     await newRequest.save();
+
+    // Emit socket event if io is attached to app
+    if (req.app.get('io')) {
+      const io = req.app.get('io');
+      io.emit('newBloodRequest', newRequest);
+    }
+
     res.status(201).json(newRequest);
   } catch (err) {
     res.status(400).json({ message: err.message });

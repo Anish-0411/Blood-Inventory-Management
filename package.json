@@ -11,6 +11,7 @@
     "bootstrap": "^5.3.5",
     "chart.js": "^4.4.8",
     "cors": "^2.8.5",
+    "detect-port-alt": "^1.1.6",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
@@ -50,6 +51,9 @@
     ]
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.28.0",
+    "eslint": "^8.57.1",
+    "eslint-config-react-app": "^7.0.1",
     "nodemon": "^3.1.9"
   }
 }

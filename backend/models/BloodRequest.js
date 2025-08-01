@@ -22,10 +22,14 @@ const bloodRequestSchema = new mongoose.Schema({
     type: String,
     default: 'Pending'
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  from: {
+    type: String,
+    required: true
+  },
+  to: {
+    type: String,
+    required: true
   }
-});
+}, { timestamps: true }); // ✅ Enable auto createdAt and updatedAt
 
 module.exports = mongoose.model('BloodRequest', bloodRequestSchema);

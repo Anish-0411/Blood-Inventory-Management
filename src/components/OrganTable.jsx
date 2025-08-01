@@ -1,31 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import './OrganTable.css'; // Import your styles here
+import './OrganTable.css';
 
-const OrganTable = ({ organType, bloodGroup }) => {
+const OrganTable = ({ organType, bloodGroup, city }) => {
   const [donors, setDonors] = useState([]);
-  const [poppedRow, setPoppedRow] = useState(null); // To handle per-row pop animation
+  const [poppedRow, setPoppedRow] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:5000/donors')
-      .then((response) => response.json())
-      .then((data) => {
-        setDonors(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching donors:', error);
-      });
-  }, []);
-
-  const filteredDonors = donors.filter((donor) => {
-    const organMatch = organType ? donor.organ.toLowerCase() === organType.toLowerCase() : true;
-    const bloodMatch = bloodGroup ? donor.bloodType.toUpperCase() === bloodGroup.toUpperCase() : true;
-    return organMatch && bloodMatch;
-  });
+    if (!city) {
+      setDonors([]);
+      return;
+    }
+    const fetchDonors = async () => {
+      try {
+        const url = new URL("http://localhost:5050/api/find-donors");
+        url.searchParams.append("city", city);
+        if (organType) url.searchParams.append("organ", organType);
+        if (bloodGroup) url.searchParams.append("bloodType", bloodGroup);
+        const res = await fetch(url);
+        const data = await res.json();
+        setDonors(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Error fetching donors:", err);
+      }
+    };
+    fetchDonors();
+  }, [organType, bloodGroup, city]);
 
   const handleMatchRequest = (index) => {
-    setPoppedRow(index); // Trigger pop effect on clicked row
-    setTimeout(() => setPoppedRow(null), 100); // Remove pop after animation time
-    alert(`Match request sent for donor: ${filteredDonors[index].name}`);
+    setPoppedRow(index);
+    setTimeout(() => setPoppedRow(null), 100);
+    alert(`Match request sent for donor: ${donors[index].name}`);
   };
 
   return (
@@ -34,7 +38,37 @@ const OrganTable = ({ organType, bloodGroup }) => {
         <h2>Available Donations</h2>
       </div>
       <div className="table-container">
-      <div class="table-container"><table><thead><tr><th>Name</th><th>Organ</th><th>Donor Location</th><th>Availability</th><th>Compatibility (%)</th><th>Action</th></tr></thead><tbody><tr><td>Riya Sharma</td><td>Kidney</td><td>Chennai</td><td>High</td><td>89%</td><td><button class="pop-btn">Match Request</button></td></tr><tr><td>John Doe</td><td>Kidney</td><td>Chennai</td><td>high</td><td>87%</td><td><button class="pop-btn">Match Request</button></td></tr><tr><td>Lakshmi</td><td>Kidney</td><td>Chennai</td><td>High</td><td>91%</td><td><button class="pop-btn">Match Request</button></td></tr><tr><td>Arjun Mehta</td><td>Liver</td><td>Mumbai</td><td>Medium</td><td>86%</td><td><button class="pop-btn">Match Request</button></td></tr><tr><td>Sneha Reddy</td><td>Heart</td><td>Hyderabad</td><td>High</td><td>85%</td><td><button class="pop-btn">Match Request</button></td></tr><tr><td>Ravi Sharma</td><td>Lungs</td><td>Delhi</td><td>Low</td><td>93%</td><td><button class="pop-btn">Match Request</button></td></tr></tbody></table></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Organ</th>
+              <th>City</th>
+              <th>Availability</th>
+              {/* Removed Compatibility column as requested */}
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {donors.map((donor, index) => (
+              <tr key={index} className={poppedRow === index ? 'popped-row' : ''}>
+                <td>{donor.name}</td>
+                <td>{donor.donationType}</td>
+                <td>{donor.location}</td>
+                <td>{donor.availability || 'High'}</td>
+                {/* Compatibility removed */}
+                <td>
+                  <button
+                    className="pop-btn"
+                    onClick={() => handleMatchRequest(index)}
+                  >
+                    Match Request
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

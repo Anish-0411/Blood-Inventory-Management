@@ -1,18 +1,15 @@
 // src/api.js
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+
 const API = axios.create({
   baseURL: 'http://localhost:5050/api',
   withCredentials: true, 
 });
 
-// // Login
-// export const login = (formData) => API.post('/login', formData);
 
-// // Register
-// export const register = (formData) => API.post('/register', formData);
 
-// ✅ FIXED
 export const login = (formData) => API.post('/auth/login', formData);
 export const register = (formData) => API.post('/auth/register', formData);
 
@@ -36,3 +33,4 @@ export const getDonors = () => API.get('/donors');
 // Recipients
 export const registerRecipient = (formData) => API.post('/recipients', formData);
 export const getRecipients = () => API.get('/recipients');
+

@@ -1,223 +1,6 @@
-// import React, { useState } from 'react';
-// import './request.css';
-
-// function Request() {
-//   // State for Send Request form
-//   const [bloodType, setBloodType] = useState('A+');
-//   const [quantity, setQuantity] = useState(1);
-//   const [urgency, setUrgency] = useState('Medium');
-//   const [location, setLocation] = useState('');
-//   const [status, setStatus] = useState('');
-  
-//   // State for Manage Requests
-//   const [requests, setRequests] = useState([
-//     { id: 123, bloodType: 'A+', quantity: 5, urgency: 'High', location: 'City Hospital' },
-//     { id: 124, bloodType: 'O-', quantity: 3, urgency: 'Medium', location: 'General Hospital' }
-//   ]);
-
-//   // Blood type options
-//   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-
-//   // Hospital options for autocomplete
-//   const hospitals = [
-//     'City Hospital', 
-//     'General Hospital', 
-//     'Central Medical', 
-//     'Unity Health', 
-//     'Regional Medical Center'
-//   ];
-
-//   // Handle form submission
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     setStatus('Sending...');
-    
-//     // Simulate API call
-//     setTimeout(() => {
-//       const newRequest = {
-//         id: Math.floor(Math.random() * 1000),
-//         bloodType,
-//         quantity,
-//         urgency,
-//         location
-//       };
-      
-//       setRequests([...requests, newRequest]);
-//       setStatus('Sent!');
-      
-//       // Reset status after 3 seconds
-//       setTimeout(() => setStatus(''), 3000);
-      
-//       // Reset form fields
-//       setBloodType('A+');
-//       setQuantity(1);
-//       setUrgency('Medium');
-//       setLocation('');
-//     }, 1500);
-//   };
-
-//   // Handle request actions
-//   const handleRequestAction = (id, action) => {
-//     if (action === 'Rejected') {
-//       // Remove the request from the array
-//       setRequests(requests.filter(request => request.id !== id));
-//     } else {
-//       // For other actions (like Accept), update the status
-//       setRequests(requests.map(req => 
-//         req.id === id ? { ...req, status: action } : req
-//       ));
-//     }
-//   };
-
-//   return (
-//     <div className="app">
-//       <header className="app-header">
-//         <h1>BloodMatch Dashboard</h1>
-//       </header>
-      
-//       <div className="dashboard-container">
-//         {/* Left Section - Send Request */}
-//         <div className="send-request-section">
-//           <div className="section-header">
-//             <h2>Send Blood Request</h2>
-//           </div>
-          
-//           <form onSubmit={handleSubmit} className="request-form">
-//             <div className="form-group">
-//               <label>1. Blood Type:</label>
-//               <select 
-//                 value={bloodType} 
-//                 onChange={(e) => setBloodType(e.target.value)}
-//                 className="blood-type-select"
-//               >
-//                 {bloodTypes.map(type => (
-//                   <option key={type} value={type}>{type}</option>
-//                 ))}
-//               </select>
-//             </div>
-            
-//             <div className="form-group">
-//               <label>2. Quantity (units):</label>
-//               <input 
-//                 type="number" 
-//                 min="1" 
-//                 max="100" 
-//                 value={quantity}
-//                 onChange={(e) => setQuantity(e.target.value)}
-//                 className="quantity-input"
-//               />
-//             </div>
-            
-//             <div className="form-group">
-//               <label>3. Urgency:</label>
-//               <div className="urgency-slider">
-//                 <input 
-//                   type="range" 
-//                   min="0" 
-//                   max="2" 
-//                   value={urgency === 'Low' ? 0 : urgency === 'Medium' ? 1 : 2}
-//                   onChange={(e) => 
-//                     setUrgency(['Low', 'Medium', 'High'][e.target.value])
-//                   }
-//                   className="slider"
-//                   data-urgency={urgency.toLowerCase()}
-//                 />
-//                 <div className="slider-labels">
-//                   <span>Low</span>
-//                   <span>Medium</span>
-//                   <span>High</span>
-//                 </div>
-//                 <div className={`urgency-indicator ${urgency.toLowerCase()}`}>
-//       {urgency} 
-//     </div>              </div>
-//             </div>
-            
-//             <div className="form-group">
-//               <label>4. Location:</label>
-//               <input 
-//                 type="text" 
-//                 value={location}
-//                 onChange={(e) => setLocation(e.target.value)}
-//                 list="hospitals"
-//                 className="location-input"
-//                 placeholder="Start typing hospital name..."
-//               />
-//               <datalist id="hospitals">
-//                 {hospitals.map(hospital => (
-//                   <option key={hospital} value={hospital} />
-//                 ))}
-//               </datalist>
-//             </div>
-            
-//             <button type="submit" className="send-button">
-//               Send Request
-//             </button>
-            
-//             {status && (
-//               <div className={`status-badge ${status === 'Sent!' ? 'success' : 'sending'}`}>
-//                 {status}
-//               </div>
-//             )}
-//           </form>
-//         </div>
-        
-//         {/* Right Section - Manage Requests */}
-//         <div className="manage-requests-section">
-//           <div className="section-header">
-//             <h2>Incoming & Managed Requests</h2>
-//           </div>
-          
-//           <div className="requests-list">
-//             {requests.length > 0 ? (
-//               requests.map(request => (
-//                 <div 
-//                   key={request.id} 
-//                   className={`request-card ${request.urgency.toLowerCase()}`}
-//                 >
-//                   <div className="card-header">
-//                     <span className="request-id">Request #{request.id}</span>
-//                     <span className="blood-type">{request.bloodType}</span>
-//                     <span className="quantity">{request.quantity} units</span>
-//                     <span className="urgency">{request.urgency} Urgency</span>
-//                   </div>
-//                   <div className="card-body">
-//                     <div className="location">{request.location}</div>
-//                     <div className="action-buttons">
-//                       <button 
-//                         className="accept-button"
-//                         onClick={() => handleRequestAction(request.id, 'Accepted')}
-//                       >
-//                         Accept
-//                       </button>
-//                       <button 
-//                         className="reject-button"
-//                         onClick={() => handleRequestAction(request.id, 'Rejected')}
-//                       >
-//                         Reject
-//                       </button>
-//                       <button className="details-button">Details</button>
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))
-//             ) : (
-//               <div className="no-requests">
-//                 No pending requests available
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-      
-//       <footer className="app-footer">
-//         <p>Powered by xAI - Real-Time Matching</p>
-//       </footer>
-//     </div>
-//   );
-// }
-
-// export default Request;
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import socket from '../socket';
 import './request.css';
 
 function Request() {
@@ -227,82 +10,185 @@ function Request() {
   const [urgency, setUrgency] = useState('Medium');
   const [location, setLocation] = useState('');
   const [status, setStatus] = useState('');
-  
   // State for Manage Requests
   const [requests, setRequests] = useState([
     { id: 123, bloodType: 'A+', quantity: 5, urgency: 'High', location: 'City Hospital' },
     { id: 124, bloodType: 'O-', quantity: 3, urgency: 'Medium', location: 'General Hospital' }
   ]);
-
   // Blood type options
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  // Hospital list for autocomplete
+  const [hospitalList, setHospitalList] = useState([]);
 
-  // Hospital options for autocomplete
-  const hospitals = [
-    'City Hospital', 
-    'General Hospital', 
-    'Central Medical', 
-    'Unity Health', 
-    'Regional Medical Center'
-  ];
+useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        const res = await axios.get('http://localhost:5050/api/hospitals'); // Confirmed correct
+        const allHospitals = res.data;
+
+        const currentId = localStorage.getItem('hospitalId');
+        const currentHospital = allHospitals.find(h => String(h.hospitalId) === String(currentId));
+        if (!currentHospital) return;
+
+        const currentCoords = await getCoords(currentHospital.location);
+
+        const hospitalsWithinRadius = [];
+
+        for (const h of allHospitals) {
+          if (String(h.hospitalId) === String(currentId)) continue;
+          const coords = await getCoords(h.location);
+          const distance = haversine(currentCoords, coords);
+          console.log(`Distance from ${currentHospital.location} to ${h.location}: ${distance.toFixed(2)} km`);
+          if (distance <= 1000) hospitalsWithinRadius.push(h);
+        }
+
+        setHospitalList(hospitalsWithinRadius);
+      } catch (err) {
+        console.error('Error fetching hospitals:', err);
+      }
+    };
+
+    const fetchRequests = async () => {
+      try {
+        const res = await axios.get('http://localhost:5050/api/requests');
+        const currentHospitalId = localStorage.getItem('hospitalId');
+        const filtered = res.data.filter(
+          r =>
+            (String(r.to) === String(currentHospitalId) || String(r.from) === String(currentHospitalId))
+        );
+        setRequests(filtered);
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+      }
+    };
+
+    fetchHospitals();
+    fetchRequests();
+
+    const handleSocketUpdate = async () => {
+      await fetchRequests();
+    };
+
+    socket.off('newBloodRequest').on('newBloodRequest', handleSocketUpdate);
+
+    return () => {
+      socket.off('newBloodRequest', handleSocketUpdate);
+    };
+  }, []);
+
+  // Helper functions
+  const getCoords = async (location) => {
+    const res = await axios.get(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`,
+      {
+        withCredentials: false,
+        headers: {
+          'Accept': 'application/json'
+        }
+      }
+    );
+    if (res.data.length === 0) throw new Error('Location not found');
+    return {
+      lat: parseFloat(res.data[0].lat),
+      lon: parseFloat(res.data[0].lon)
+    };
+  };
+
+  const haversine = (coord1, coord2) => {
+    const R = 6371;
+    const dLat = toRad(coord2.lat - coord1.lat);
+    const dLon = toRad(coord2.lon - coord1.lon);
+    const lat1 = toRad(coord1.lat);
+    const lat2 = toRad(coord2.lat);
+    const a = Math.sin(dLat/2) ** 2 + Math.sin(dLon/2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const toRad = (deg) => deg * Math.PI / 180;
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('Sending...');
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const from = localStorage.getItem('hospitalId');
+      // Debug logs for hospital list and user-selected location
+      console.log("Hospital List:", hospitalList);
+      console.log("User-selected Location:", location);
+      const toHospital = hospitalList.find(
+        h => h.name === location
+      );
+      if (!toHospital) {
+        setStatus('Hospital not found');
+        return;
+      }
+
       const newRequest = {
         id: Math.floor(Math.random() * 1000),
         bloodType,
         quantity,
         urgency,
-        location
+        location: toHospital.name,
+        from: from,
+        to: toHospital.hospitalId
       };
-      
-      setRequests([...requests, newRequest]);
+
+      console.log("Sending request:", newRequest);
+
+      try {
+        const response = await axios.post('http://localhost:5050/api/requests', newRequest);
+        socket.emit('bloodRequest', response.data);
+      } catch (err) {
+        console.error("Failed to save new request:", err);
+      }
       setStatus('Sent!');
-      
-      // Reset status after 3 seconds
+
       setTimeout(() => setStatus(''), 3000);
-      
-      // Reset form fields
+
       setBloodType('A+');
       setQuantity(1);
       setUrgency('Medium');
       setLocation('');
-    }, 1500);
-  };
-
-  // Handle request actions
-  const handleRequestAction = (id, action) => {
-    if (action === 'Rejected') {
-      setRequests(requests.map(req => 
-        req.id === id ? { ...req, status: 'Rejected' } : req
-      ));
-      // Remove the request after 2 seconds
-      setTimeout(() => {
-        setRequests(requests.filter(request => request.id !== id));
-      }, 2000);
-    } else {
-      setRequests(requests.map(req => 
-        req.id === id ? { ...req, status: action } : req
-      ));
+    } catch (error) {
+      console.error('Error sending request:', error);
+      setStatus('Error sending request');
     }
   };
 
+  // Handle request actions
+  const handleRequestAction = async (id, action) => {
+    try {
+      await axios.put(`http://localhost:5050/api/requests/${id}`, { status: action });
+
+      if (action === 'Rejected') {
+        setRequests(requests.map(req =>
+          (req.id || req._id) === id ? { ...req, status: 'Rejected' } : req
+        ));
+        setTimeout(() => {
+          setRequests(requests.filter(request => (request.id || request._id) !== id));
+        }, 2000);
+      } else {
+        setRequests(requests.map(req =>
+          (req.id || req._id) === id ? { ...req, status: action } : req
+        ));
+      }
+    } catch (err) {
+      console.error("Failed to update request status:", err);
+    }
+  };
+
+  // Add activeTab state for tab switching
+  const [activeTab, setActiveTab] = useState('incoming');
+
   return (
     <div className="app">
-
-      
       <div className="dashboard-container">
         {/* Left Section - Send Request */}
         <div className="send-request-section">
           <div className="section-header">
             <h2>Send Blood Request</h2>
           </div>
-          
           <form onSubmit={handleSubmit} className="request-form">
             <div className="form-group">
               <label>1. Blood Type:</label>
@@ -316,7 +202,6 @@ function Request() {
                 ))}
               </select>
             </div>
-            
             <div className="form-group">
               <label>2. Quantity (units):</label>
               <input 
@@ -328,7 +213,6 @@ function Request() {
                 className="quantity-input"
               />
             </div>
-            
             <div className="form-group">
               <label>3. Urgency:</label>
               <div className="urgency-slider">
@@ -353,28 +237,24 @@ function Request() {
                 </div>
               </div>
             </div>
-            
             <div className="form-group">
               <label>4. Location:</label>
-              <input 
-                type="text" 
+              <select 
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                list="hospitals"
                 className="location-input"
-                placeholder="Start typing hospital name..."
-              />
-              <datalist id="hospitals">
-                {hospitals.map(hospital => (
-                  <option key={hospital} value={hospital} />
+              >
+                <option value="">-- Select Hospital --</option>
+                {hospitalList.map(h => (
+                  <option key={h.hospitalId} value={h.name}>
+                    {h.name}
+                  </option>
                 ))}
-              </datalist>
+              </select>
             </div>
-            
             <button type="submit" className="send-button">
               Send Request
             </button>
-            
             {status && (
               <div className={`status-badge ${status === 'Sent!' ? 'success' : 'sending'}`}>
                 {status}
@@ -382,64 +262,77 @@ function Request() {
             )}
           </form>
         </div>
-        
         {/* Right Section - Manage Requests */}
         <div className="manage-requests-section">
           <div className="section-header">
             <h2>Incoming & Managed Requests</h2>
           </div>
-          
           <div className="requests-list">
-            {requests.length > 0 ? (
-              requests.map(request => (
-                <div 
-                  key={request.id} 
-                  className={`request-card ${request.urgency.toLowerCase()} ${request.status?.toLowerCase() || ''}`}
-                >
-                  <div className="card-header">
-                    <span className="request-id">Request #{request.id}</span>
-                    <span className="blood-type">{request.bloodType}</span>
-                    <span className="quantity">{request.quantity} units</span>
-                    <span className="urgency">{request.urgency} Urgency</span>
-                    {request.status && (
-                      <span className={`request-status ${request.status.toLowerCase()}`}>
-                        {request.status}
-                      </span>
-                    )}
-                  </div>
-                  <div className="card-body">
-                    <div className="location">{request.location}</div>
-                    {!request.status && (
-                      <div className="action-buttons">
-                        <button 
-                          className="accept-button"
-                          onClick={() => handleRequestAction(request.id, 'Accepted')}
-                        >
-                          Accept
-                        </button>
-                        <button 
-                          className="reject-button"
-                          onClick={() => handleRequestAction(request.id, 'Rejected')}
-                        >
-                          Reject
-                        </button>
+            <div className="request-tabs">
+              <button
+                className={activeTab === 'incoming' ? 'active-tab' : ''}
+                onClick={() => setActiveTab('incoming')}
+              >
+                Incoming Requests ({requests.filter(r => String(r.to) === String(localStorage.getItem('hospitalId'))).length})
+              </button>
+              <button
+                className={activeTab === 'outgoing' ? 'active-tab' : ''}
+                onClick={() => setActiveTab('outgoing')}
+              >
+                Outgoing Requests ({requests.filter(r => String(r.from) === String(localStorage.getItem('hospitalId'))).length})
+              </button>
+            </div>
+            {activeTab === 'incoming' ? (
+              requests.filter(r => String(r.to) === String(localStorage.getItem('hospitalId'))).length > 0 ? (
+                requests.filter(r => String(r.to) === String(localStorage.getItem('hospitalId'))).map(request => (
+                  <div key={request.id || request._id} className={`request-card ${request.urgency.toLowerCase()} ${request.status?.toLowerCase() || ''}`}>
+                    <div className="card-header">
+                      <div><strong>Request ID:</strong> {request.id || request._id}</div>
+                      <div><strong>Units:</strong> {request.quantity} unit(s) of {request.bloodType}</div>
+                      <div><strong>Urgency:</strong> {request.urgency}</div>
+                    </div>
+                    <div className="card-body">
+                      <div className="timestamp">
+                        <strong>Requested on:</strong> {request.createdAt ? new Date(request.createdAt).toLocaleString() : 'N/A'}
                       </div>
-                    )}
+                      {/* Optionally, keep location or other details here if needed */}
+                      {!request.status && (
+                        <div className="action-buttons">
+                          <button className="accept-button" onClick={() => handleRequestAction(request.id || request._id, 'Accepted')}>Accept</button>
+                          <button className="reject-button" onClick={() => handleRequestAction(request.id || request._id, 'Rejected')}>Reject</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
+              ) : (
+                <div className="no-requests">No incoming requests</div>
+              )
             ) : (
-              <div className="no-requests">
-                No pending requests available
-              </div>
+              requests.filter(r => String(r.from) === String(localStorage.getItem('hospitalId'))).length > 0 ? (
+                requests.filter(r => String(r.from) === String(localStorage.getItem('hospitalId'))).map(request => (
+                  <div key={request.id || request._id} className={`request-card ${request.urgency.toLowerCase()} ${request.status?.toLowerCase() || ''}`}>
+                    <div className="card-header">
+                      <div><strong>Request ID:</strong> {request.id || request._id}</div>
+                      <div><strong>Units:</strong> {request.quantity} unit(s) of {request.bloodType}</div>
+                      <div><strong>Urgency:</strong> {request.urgency}</div>
+                    </div>
+                    <div className="card-body">
+                      <div className="timestamp">
+                        <strong>Requested on:</strong> {request.createdAt ? new Date(request.createdAt).toLocaleString() : 'N/A'}
+                      </div>
+                      {/* Optionally, keep location or other details here if needed */}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-requests">No outgoing requests</div>
+              )
             )}
           </div>
         </div>
       </div>
-      
-      
     </div>
-    
   );
 }
 
