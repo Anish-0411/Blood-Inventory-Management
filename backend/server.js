@@ -69,12 +69,15 @@ app.get('/', (req, res) => {
   res.send("🩺 Organ Donation Backend is running!");
 });
 
+
+
 // ✅ Start server with socket.io
 const PORT = process.env.PORT || 10000;
 const server = http.createServer(app);
 
 
 const io = new Server(server, {
+  path: "/socket.io",
   cors: {
     origin: allowedOrigin,
     methods: ['GET', 'POST'],
@@ -96,6 +99,8 @@ io.on('connection', (socket) => {
     io.emit('newBloodRequest', data);
   });
 });
+
+
 
 server.listen(PORT, () => {
   // console.log(`🚀 Server with socket.io running at http://localhost:${PORT}`);

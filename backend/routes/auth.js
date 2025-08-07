@@ -75,7 +75,7 @@ router.post('/login', async (req, res) => {
     // Send JWT as cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,      // Set to true in production with HTTPS
+      secure: true,      // Set to true in production with HTTPS
       sameSite: 'lax',    // 'none' if frontend and backend are on different domains with HTTPS
       maxAge: 3600000     // 1 hour
     });

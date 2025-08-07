@@ -20,7 +20,8 @@
 import { io } from 'socket.io-client';
 
 const socket = io(process.env.REACT_APP_API_URL, {
-  transports: ['polling', 'websocket'], // polling first
+  path: "/socket.io",
+  transports: ['websocket'], 
   withCredentials: true,
   reconnection: true,
   secure: true,
