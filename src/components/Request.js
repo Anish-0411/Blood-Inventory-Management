@@ -50,7 +50,7 @@ useEffect(() => {
 
     const fetchRequests = async () => {
       try {
-        const res = await axios.get('http://${process.env.REACT_APP_API_URL}/api/requests');
+        const res = await axios.get(`http://${process.env.REACT_APP_API_URL}/api/requests`);
         const currentHospitalId = localStorage.getItem('hospitalId');
         const filtered = res.data.filter(
           r =>

@@ -11,7 +11,7 @@ function Integration() {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const res = await axios.get('http://${process.env.REACT_APP_API_URL}/api/hospitals');
+        const res = await axios.get(`http://${process.env.REACT_APP_API_URL}/api/hospitals`);
         const hospitals = res.data.map(h => {
           const lowUnits = h.bloodInventory?.filter(unit => unit.quantity < 10).map(u => u.type);
           const status = lowUnits?.length
