@@ -113,7 +113,7 @@ function RegistrationDonor({ setView }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://${process.env.REACT_APP_API_URL}/api/donors", formData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/donors`, formData);
 
       if (response.status === 201) {
         showPopup("✅ Donor registered successfully!", "success");
@@ -483,7 +483,7 @@ function RegistrationRecipient({ setView }) {
 
   const sendOTP = async () => {
     try {
-      const response = await axios.post("http://${process.env.REACT_APP_API_URL}/send-otp", {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/send-otp`, {
         phone: formData.phone,
       });
 
@@ -508,7 +508,7 @@ function RegistrationRecipient({ setView }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://${process.env.REACT_APP_API_URL}/api/recipients", formData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/recipients`, formData);
 
       if (response.status === 201) {
         showPopup(" Recipient registered successfully!", "success");
