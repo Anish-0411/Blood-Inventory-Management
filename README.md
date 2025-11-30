@@ -18,11 +18,10 @@ Use these to log in and explore the application:
 
 ## 🛠️ Tech Stack
 
-> _*(Tech stack tags are based on common choices for inventory management apps. Please update if needed.)*_
 
-- **Backend:** _[Suggest: Python (Flask) or Django, Node.js (Express)]_
-- **Database:** _[Suggest: MySQL, PostgreSQL, SQLite, or MongoDB]_
-- **Frontend:** _[Suggest: HTML, CSS, Bootstrap, or React, Angular, Vue]_
+- **Backend:** _[Node.js (Express)]_
+- **Database:** _[MongoDB]_
+- **Frontend:** _[HTML, CSS, Bootstrap, or React,]_
 - **Deployment:** Render.com
 
 ---
